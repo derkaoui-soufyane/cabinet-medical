@@ -106,6 +106,18 @@
                 app:backgroundTint="#00CECE"
                 app:cornerRadius="10dp"
                 app:rippleColor="#00A8A8"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/signupBtn"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="24dp"
+                android:text="inscrire"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:backgroundTint="#00CECE"
+                app:cornerRadius="10dp"
+                app:rippleColor="#00A8A8"/>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

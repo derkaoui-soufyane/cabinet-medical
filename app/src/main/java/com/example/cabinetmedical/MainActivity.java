@@ -11,13 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cabinetmedical.Admin.AdminActivity;
 import com.example.cabinetmedical.Entity.user;
+import com.example.cabinetmedical.signup.signupActivity;
 import com.example.cabinetmedical.database.DatabaseHelper;
 import com.example.cabinetmedical.patient.patientActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText email, password;
-    Button loginBtn;
+    Button loginBtn, signupBtn;
 
     DatabaseHelper db;
 
@@ -32,21 +33,35 @@ public class MainActivity extends AppCompatActivity {
 
         email = findViewById(R.id.emailInput);
         password = findViewById(R.id.passwordInput);
-        loginBtn = findViewById(R.id.loginBtn);
 
+        loginBtn = findViewById(R.id.loginBtn);
+        signupBtn = findViewById(R.id.signupBtn);
+
+        // OPEN SIGNUP PAGE
+        signupBtn.setOnClickListener(v -> {
+
+            Intent intent = new Intent(MainActivity.this,
+                    signupActivity.class);
+
+            startActivity(intent);
+        });
+
+        // LOGIN
         loginBtn.setOnClickListener(v -> {
 
             String emailTxt = email.getText().toString().trim();
             String passwordTxt = password.getText().toString().trim();
 
             if (emailTxt.isEmpty() || passwordTxt.isEmpty()) {
+
                 Toast.makeText(this,
                         "Veuillez remplir tous les champs",
                         Toast.LENGTH_SHORT).show();
+
                 return;
             }
 
-            // 🔥 LOGIN FROM SQLITE
+            // LOGIN SQLITE
             user u = db.login(emailTxt, passwordTxt);
 
             if (u != null) {
@@ -74,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(MainActivity.this,
                             patientActivity.class);
+
                     intent.putExtra("id", u.getId());
                     intent.putExtra("email", u.getEmail());
                     intent.putExtra("role", u.getRole());
@@ -85,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             } else {
+
                 Toast.makeText(this,
                         "Email ou mot de passe incorrect ❌",
                         Toast.LENGTH_SHORT).show();

@@ -27,6 +27,12 @@
         <activity
             android:name=".patient.patientActivity"
             android:exported="false"/>
+        <activity
+            android:name=".signup.signupActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".Admin.ajouterP"
+            android:exported="false"/>
 
     </application>
 
