@@ -1,41 +1,94 @@
 package com.example.cabinetmedical;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.example.cabinetmedical.Admin.AdminActivity;
+import com.example.cabinetmedical.Entity.user;
+import com.example.cabinetmedical.database.DatabaseHelper;
+import com.example.cabinetmedical.patient.patientActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnPatients;
-    private Button btnNouveauMedecin;
+    EditText email, password;
+    Button loginBtn;
+
+    DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Gestion des barres système
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        db = new DatabaseHelper(this);
 
-        // Liaison des boutons graphiques
-        btnPatients = findViewById(R.id.btnPatients);
-        btnNouveauMedecin = findViewById(R.id.btnNouveauMedecin);
+        email = findViewById(R.id.emailInput);
+        password = findViewById(R.id.passwordInput);
+        loginBtn = findViewById(R.id.loginBtn);
 
-        // Actions au clic
-        btnPatients.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "Ouverture : Gestion des Patients", Toast.LENGTH_SHORT).show();
-        });
+        loginBtn.setOnClickListener(v -> {
 
-        btnNouveauMedecin.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "Ouverture : Formulaire Nouveau Médecin", Toast.LENGTH_SHORT).show();
+            String emailTxt = email.getText().toString().trim();
+            String passwordTxt = password.getText().toString().trim();
+
+            if (emailTxt.isEmpty() || passwordTxt.isEmpty()) {
+                Toast.makeText(this,
+                        "Veuillez remplir tous les champs",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 🔥 LOGIN FROM SQLITE
+            user u = db.login(emailTxt, passwordTxt);
+
+            if (u != null) {
+
+                Toast.makeText(this,
+                        "Bienvenue " + u.getRole(),
+                        Toast.LENGTH_SHORT).show();
+
+                // ADMIN
+                if ("medecin".equalsIgnoreCase(u.getRole())) {
+
+                    Intent intent = new Intent(MainActivity.this,
+                            AdminActivity.class);
+
+                    intent.putExtra("email", u.getEmail());
+                    intent.putExtra("role", u.getRole());
+                    intent.putExtra("id", u.getId());
+
+                    startActivity(intent);
+                    finish();
+                }
+
+                // PATIENT
+                else if ("patient".equalsIgnoreCase(u.getRole())) {
+
+                    Intent intent = new Intent(MainActivity.this,
+                            patientActivity.class);
+                    intent.putExtra("id", u.getId());
+                    intent.putExtra("email", u.getEmail());
+                    intent.putExtra("role", u.getRole());
+                    intent.putExtra("nom", u.getNom());
+                    intent.putExtra("prenom", u.getPrenom());
+
+                    startActivity(intent);
+                    finish();
+                }
+
+            } else {
+                Toast.makeText(this,
+                        "Email ou mot de passe incorrect ❌",
+                        Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }
