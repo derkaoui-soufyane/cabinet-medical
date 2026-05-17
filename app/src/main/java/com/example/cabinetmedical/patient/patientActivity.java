@@ -61,7 +61,7 @@ public class patientActivity extends AppCompatActivity {
         emailText.setText(email != null ? email : "");
     }
 
-    // ---------- LOAD DATA ----------
+
     private void loadConsultations() {
         Cursor cursor = db.getConsultationsByPatient(patientId);
 

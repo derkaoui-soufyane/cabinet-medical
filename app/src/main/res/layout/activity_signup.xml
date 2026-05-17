@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#324047">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Up Medecin"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="30dp"/>
+
+    <EditText
+        android:id="@+id/nom"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Nom"
+        android:padding="15dp"
+        android:background="#EFEFEF"
+        android:textColor="#000000"
+        android:textColorHint="#777777"
+        android:layout_marginBottom="15dp"/>
+
+    <EditText
+        android:id="@+id/prenom"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Prénom"
+        android:inputType="textPersonName"
+        android:padding="15dp"
+        android:background="#EFEFEF"
+        android:textColor="#000000"
+        android:textColorHint="#777777"
+        android:layout_marginBottom="15dp"/>
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="15dp"
+        android:background="#EFEFEF"
+        android:textColor="#000000"
+        android:textColorHint="#777777"
+        android:layout_marginBottom="15dp"/>
+
+    <EditText
+        android:id="@+id/password2"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="15dp"
+        android:background="#EFEFEF"
+        android:textColor="#000000"
+        android:textColorHint="#777777"
+        android:layout_marginBottom="25dp"/>
+
+    <Button
+        android:id="@+id/btnSignup"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="Create Account"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#00CECE"/>
+
+</LinearLayout>

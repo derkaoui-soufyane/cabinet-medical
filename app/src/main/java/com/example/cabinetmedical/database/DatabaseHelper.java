@@ -97,22 +97,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return null;
-    }
-
-    // ================= INSERT USER =================
+    }// ================= INSERT USER =================
     public boolean insertUser(String nom, String prenom,
                               String email, String password,
                               String role) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("INSERT INTO user(nom,prenom,email,password,role) VALUES('" +
-                nom + "','" + prenom + "','" + email + "','" + password + "','" + role + "')");
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM user WHERE email=?",
+                new String[]{email}
+        );
 
-        return true;
+        if (cursor.moveToFirst()) {
+            cursor.close();
+            return false;
+        }
+
+        cursor.close();
+
+        try {
+            db.execSQL(
+                    "INSERT INTO user(nom,prenom,email,password,role) VALUES(?,?,?,?,?)",
+                    new Object[]{nom, prenom, email, password, role}
+            );
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    // ================= INSERT CONSULTATION =================
     public boolean insertConsultation(int patientId, int medcinId,
                                       String description, String date,
                                       double prix) {
