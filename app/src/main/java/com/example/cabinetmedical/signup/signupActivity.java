@@ -74,7 +74,8 @@ public class signupActivity extends AppCompatActivity {
                     prenomTxt,
                     emailTxt,
                     passwordTxt,
-                    "medecin"
+                    "medecin",
+                    null
             );
 
             // SUCCESS

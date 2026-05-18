@@ -12,7 +12,7 @@ import com.example.cabinetmedical.Entity.user;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "cabinet.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public DatabaseHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -30,7 +30,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "prenom TEXT," +
                         "email TEXT UNIQUE," +
                         "password TEXT," +
-                        "role TEXT)"
+                        "role TEXT," +
+                        "medcin_id INTEGER DEFAULT NULL)"
         );
 
         // ===== CONSULTATION =====
@@ -59,9 +60,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // ================= DEFAULT DATA =================
     private void insertDefaultData(SQLiteDatabase db) {
 
-        db.execSQL("INSERT INTO user(nom,prenom,email,password,role) VALUES('Admin','System','admin@gmail.com','1234','admin')");
-        db.execSQL("INSERT INTO user(nom,prenom,email,password,role) VALUES('Ali','Patient','patient@gmail.com','1234','patient')");
-        db.execSQL("INSERT INTO user(nom,prenom,email,password,role) VALUES('Dr Ahmed','Medecin','doc@gmail.com','1234','medecin')");
+        db.execSQL("INSERT INTO user(nom,prenom,email,password,role,medcin_id) VALUES('Admin','System','admin@gmail.com','1234','admin',NULL)");
+        db.execSQL("INSERT INTO user(nom,prenom,email,password,role,medcin_id) VALUES('Ali','Patient','patient@gmail.com','1234','patient',3)");
+        db.execSQL("INSERT INTO user(nom,prenom,email,password,role,medcin_id) VALUES('Dr Ahmed','Medecin','doc@gmail.com','1234','medecin',NULL)");
 
         db.execSQL("INSERT INTO consultation(patient_id,medcin_id,description,date,prix) VALUES(2,3,'Consultation générale','2026-05-17',200)");
         db.execSQL("INSERT INTO consultation(patient_id,medcin_id,description,date,prix) VALUES(2,3,'Douleur ventre','2026-05-18',150)");
@@ -97,10 +98,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return null;
-    }// ================= INSERT USER =================
+    }
+
+    // ================= INSERT USER =================
     public boolean insertUser(String nom, String prenom,
                               String email, String password,
-                              String role) {
+                              String role, Integer medcinId) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -116,31 +119,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        try {
-            db.execSQL(
-                    "INSERT INTO user(nom,prenom,email,password,role) VALUES(?,?,?,?,?)",
-                    new Object[]{nom, prenom, email, password, role}
-            );
-            return true;
+        db.execSQL(
+                "INSERT INTO user(nom,prenom,email,password,role,medcin_id) VALUES(?,?,?,?,?,?)",
+                new Object[]{nom, prenom, email, password, role, medcinId}
+        );
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
     }
 
+    // ================= INSERT CONSULTATION =================
     public boolean insertConsultation(int patientId, int medcinId,
                                       String description, String date,
                                       double prix) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("INSERT INTO consultation(patient_id,medcin_id,description,date,prix) VALUES(" +
-                patientId + "," +
-                medcinId + ",'" +
-                description + "','" +
-                date + "'," +
-                prix + ")");
+        db.execSQL(
+                "INSERT INTO consultation(patient_id,medcin_id,description,date,prix) VALUES(?,?,?,?,?)",
+                new Object[]{patientId, medcinId, description, date, prix}
+        );
 
         return true;
     }
@@ -150,64 +147,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("INSERT INTO facture(consultation_id,montant,status) VALUES(" +
-                consultationId + "," +
-                montant + ",'" +
-                status + "')");
+        db.execSQL(
+                "INSERT INTO facture(consultation_id,montant,status) VALUES(?,?,?)",
+                new Object[]{consultationId, montant, status}
+        );
 
         return true;
     }
+    public Cursor getPatientsByMedcin(int medcinId) {
+        SQLiteDatabase db = this.getReadableDatabase();
 
-    // ================= CONSULTATIONS BY PATIENT =================
+        return db.rawQuery(
+                "SELECT id, nom, prenom, email FROM user WHERE role='patient' AND medcin_id=?",
+                new String[]{String.valueOf(medcinId)}
+        );
+    }
 
+    // ================= CONSULTATIONS PATIENT =================
     public Cursor getConsultationsByPatient(int patientId) {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
         return db.rawQuery(
-                "SELECT c.id, c.description, c.date, c.prix, " +
-                        "m.nom, m.prenom " +
+                "SELECT c.id, c.description, c.date, c.prix, m.nom, m.prenom " +
                         "FROM consultation c " +
                         "JOIN user m ON c.medcin_id = m.id " +
                         "WHERE c.patient_id = ?",
                 new String[]{String.valueOf(patientId)}
         );
     }
-    // ================= CONSULTATIONS BY MEDCIN =================
+
     public Cursor getConsultationsByMedcin(int medcinId) {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
         return db.rawQuery(
-                "SELECT c.id, c.description, c.date, c.prix, " +
-                        "p.nom, p.prenom " +
-                        "FROM consultation c " +
-                        "JOIN user p ON c.patient_id = p.id " +
-                        "WHERE c.medcin_id=?",
-                new String[]{String.valueOf(medcinId)}
-        );
-    }
-    public Cursor getAllConsultations() {
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        return db.rawQuery(
-                "SELECT c.id, c.description, c.date, c.prix, " +
-                        "p.nom, p.prenom, " +
-                        "m.nom, m.prenom " +
-                        "FROM consultation c " +
-                        "JOIN user p ON c.patient_id = p.id " +
-                        "JOIN user m ON c.medcin_id = m.id",
-                null
-        );
-    }
-    public Cursor getConsultationsForMedcin(int medcinId) {
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        return db.rawQuery(
-                "SELECT c.id, c.description, c.date, c.prix, " +
-                        "p.nom, p.prenom " +
+                "SELECT c.id, c.description, c.date, c.prix, p.nom, p.prenom " +
                         "FROM consultation c " +
                         "JOIN user p ON c.patient_id = p.id " +
                         "WHERE c.medcin_id = ?",
@@ -215,7 +190,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    // ================= FACTURE BY CONSULTATION =================
     public Cursor getFactureByConsultation(int consultationId) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -228,9 +202,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
         db.execSQL("DROP TABLE IF EXISTS facture");
         db.execSQL("DROP TABLE IF EXISTS consultation");
         db.execSQL("DROP TABLE IF EXISTS user");
+
         onCreate(db);
     }
 }

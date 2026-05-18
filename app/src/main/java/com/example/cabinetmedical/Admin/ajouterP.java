@@ -49,12 +49,26 @@ public class ajouterP extends AppCompatActivity {
                 return;
             }
 
+            // ================= GET MEDECIN ID =================
+            int medcinId = getIntent().getIntExtra("id", 0);
+
+            if (medcinId == 0) {
+
+                Toast.makeText(this,
+                        "Erreur medecin",
+                        Toast.LENGTH_SHORT).show();
+
+                return;
+            }
+
+            // ================= INSERT PATIENT =================
             boolean inserted = db.insertUser(
                     nom,
                     prenom,
                     email,
                     numCarte,
-                    "patient"
+                    "patient",
+                    medcinId
             );
 
             if (inserted) {
@@ -68,7 +82,7 @@ public class ajouterP extends AppCompatActivity {
             } else {
 
                 Toast.makeText(this,
-                        "Erreur insertion",
+                        "Email existe déjà",
                         Toast.LENGTH_SHORT).show();
             }
         });
