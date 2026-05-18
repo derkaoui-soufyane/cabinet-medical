@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(MainActivity.this,
                             AdminActivity.class);
+                    intent.putExtra("name", u.getNom());
+                    intent.putExtra("prenom", u.getPrenom());
 
                     intent.putExtra("email", u.getEmail());
                     intent.putExtra("role", u.getRole());
