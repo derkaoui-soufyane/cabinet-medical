@@ -1,4 +1,4 @@
-package com.example.cabinetmedical.dao;
+package com.example.cabinetmedical.dao; // ou com.example.cabinetmedical.database selon ton choix
 
 import android.content.Context;
 import androidx.room.Database;
@@ -7,24 +7,24 @@ import androidx.room.RoomDatabase;
 import com.example.cabinetmedical.model.Consultation;
 import com.example.cabinetmedical.model.Medecin;
 
-@Database(entities = {Medecin.class, Consultation.class}, version = 1, exportSchema = false)
+@Database(entities = {Consultation.class, Medecin.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
-
-    public abstract MedecinDao medecinDao();
     public abstract ConsultationDao consultationDao();
+    public abstract MedecinDao medecinDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(
                             context.getApplicationContext(),
                             AppDatabase.class,
-                            "cabinet_medical_db"
+                            "cabinet_medical_room_db" // Nom différent pour éviter tout conflit
                     ).fallbackToDestructiveMigration()
-                    .allowMainThreadQueries() // Permet de faire les requêtes simplement pour tes tests
+                    .allowMainThreadQueries()
                     .build();
         }
         return instance;
     }
+    
 }

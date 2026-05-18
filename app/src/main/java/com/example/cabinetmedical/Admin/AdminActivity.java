@@ -17,23 +17,26 @@ public class AdminActivity extends AppCompatActivity {
 
     LinearLayout patientContainer, consultationContainer;
     TextView tvCount, tvRevenu, Adminn;
+    DatabaseHelper db;
+    int medcinId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout1admin);
 
+        // Initialisation de la base de données
+        db = new DatabaseHelper(this);
+
         patientContainer = findViewById(R.id.patientContainer);
         consultationContainer = findViewById(R.id.consultationContainer);
 
         tvCount = findViewById(R.id.tvStatConsultCount);
         tvRevenu = findViewById(R.id.tvStatRevenu);
-
-        // TextView bienvenue
         Adminn = findViewById(R.id.Adminn);
 
         // ================= GET MEDECIN ID =================
-        int medcinId = getIntent().getIntExtra("id", 0);
+        medcinId = getIntent().getIntExtra("id", 0);
 
         if (medcinId == 0) {
             Toast.makeText(this, "Medcin ID invalide", Toast.LENGTH_SHORT).show();
@@ -43,28 +46,37 @@ public class AdminActivity extends AppCompatActivity {
         // ================= NOM PRENOM =================
         String nomMedcin = getIntent().getStringExtra("nom");
         String prenomMedcin = getIntent().getStringExtra("prenom");
-
         Adminn.setText("Bienvenue " + prenomMedcin + " " + nomMedcin);
 
         // ================= BUTTON AJOUT PATIENT =================
         findViewById(R.id.btnAddPatient).setOnClickListener(v -> {
-
             Intent i = new Intent(this, ajouterP.class);
-
             i.putExtra("id", medcinId);
-
             startActivity(i);
         });
+    }
 
-        DatabaseHelper db = new DatabaseHelper(this);
+    // ================= CYCLE DE VIE : REFRESH AUTOMATIQUE =================
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // À chaque fois qu'on retourne sur cet écran, on rafraîchit les listes
+        if (medcinId != 0) {
+            chargerDonnees();
+        }
+    }
 
-        // ================= PATIENTS =================
+    // ================= MÉTHODE DE CHARGEMENT DES DONNÉES =================
+    private void chargerDonnees() {
+        // IMPORTANT : On vide les anciens affichages pour éviter les doublons au rafraîchissement
+        patientContainer.removeAllViews();
+        consultationContainer.removeAllViews();
+
+        // ================= CHARGEMENT DES PATIENTS =================
         Cursor cp = db.getPatientsByMedcin(medcinId);
 
         if (cp != null && cp.moveToFirst()) {
-
             do {
-
                 int patientId = cp.getInt(0);
                 String nom = cp.getString(1);
                 String prenom = cp.getString(2);
@@ -74,6 +86,14 @@ public class AdminActivity extends AppCompatActivity {
                 card.setOrientation(LinearLayout.VERTICAL);
                 card.setPadding(30, 30, 30, 30);
                 card.setBackgroundResource(R.drawable.card_dark);
+
+                // Petite astuce de marge pour espacer les cartes
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(0, 0, 0, 20);
+                card.setLayoutParams(params);
 
                 TextView name = new TextView(this);
                 name.setText("👤 " + prenom + " " + nom);
@@ -87,14 +107,11 @@ public class AdminActivity extends AppCompatActivity {
                 card.addView(name);
                 card.addView(mail);
 
-                // ================= OPEN CONSULTATION =================
+                // ================= OUVRE LA CONSULTATION =================
                 card.setOnClickListener(v -> {
-
                     Intent i = new Intent(this, ConsultationActivity.class);
-
                     i.putExtra("patient_id", patientId);
                     i.putExtra("medcin_id", medcinId);
-
                     startActivity(i);
                 });
 
@@ -102,23 +119,17 @@ public class AdminActivity extends AppCompatActivity {
 
             } while (cp.moveToNext());
         }
+        if (cp != null) cp.close();
 
-        if (cp != null) {
-            cp.close();
-        }
 
-        // ================= CONSULTATIONS =================
+        // ================= CHARGEMENT DES CONSULTATIONS & STATS =================
         Cursor c = db.getConsultationsByMedcin(medcinId);
-
         int count = 0;
         double total = 0;
 
         if (c != null && c.moveToFirst()) {
-
             do {
-
                 count++;
-
                 total += c.getDouble(3);
 
                 String description = c.getString(1);
@@ -128,6 +139,13 @@ public class AdminActivity extends AppCompatActivity {
                 card.setOrientation(LinearLayout.VERTICAL);
                 card.setPadding(30, 30, 30, 30);
                 card.setBackgroundResource(R.drawable.card_dark);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(0, 0, 0, 20);
+                card.setLayoutParams(params);
 
                 TextView t1 = new TextView(this);
                 t1.setText("🩺 " + description);
@@ -145,12 +163,9 @@ public class AdminActivity extends AppCompatActivity {
 
             } while (c.moveToNext());
         }
+        if (c != null) c.close();
 
-        if (c != null) {
-            c.close();
-        }
-
-        // ================= STATS =================
+        // Mise à jour des compteurs statistiques globaux
         tvCount.setText(String.valueOf(count));
         tvRevenu.setText(String.format("%.0f MAD", total));
     }

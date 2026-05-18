@@ -8,19 +8,73 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consultations"
+            android:text="Dossier Patient"
             android:textColor="#FFFFFF"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="20dp" />
 
-        <!-- CONTAINER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="@drawable/card_dark"
+            android:layout_marginBottom="30dp">
+
+            <TextView
+                android:id="@+id/tvPatientDetailNom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤 Chargement du nom..."
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvPatientDetailEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✉️ email@patient.com"
+                android:textColor="#A0AEC0"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/tvPatientDetailId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ID Patient : --"
+                android:textColor="#00CECE"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Historique des Consultations"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="15dp" />
+        <Button
+            android:id="@+id/btnNouvelleConsultation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Nouvelle Consultation"
+            android:textColor="#0F172A"
+            android:backgroundTint="#00CECE"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:layout_marginBottom="25dp" />
         <LinearLayout
             android:id="@+id/consultationContainer"
             android:layout_width="match_parent"
@@ -28,5 +82,4 @@
             android:orientation="vertical" />
 
     </LinearLayout>
-
 </ScrollView>
